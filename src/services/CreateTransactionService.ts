@@ -25,37 +25,34 @@ class CreateTransactionService {
     const transactionCustonRespository = getCustomRepository(
       TransactionsRepository,
     );
-    let idNewCategory = '';
 
     if (type !== 'income' && type !== 'outcome') {
       throw new AppError('Withdrawal types and invalid entries');
     }
 
-    const balaceTotal = await (await transactionCustonRespository.getBalance())
-      .total;
+    const balaceTotal = await transactionCustonRespository.getBalance();
 
-    if (value > balaceTotal) {
-      throw new AppError('Insufficient funds', 401);
+    if (value > balaceTotal.total && type === 'outcome') {
+      throw new AppError('Insufficient funds', 400);
     }
 
-    const categoryExists = await categoryRespository.findOne({
+    let categoryExists = await categoryRespository.findOne({
       where: { title: category },
     });
 
     if (!categoryExists) {
-      const newCategory = categoryRespository.create({ title: category });
-      await categoryRespository.save(newCategory);
-      idNewCategory = newCategory.id;
+      categoryExists = categoryRespository.create({ title: category });
+      await categoryRespository.save(categoryExists);
     }
 
     const transaction = transactionRepository.create({
       title,
       value,
       type,
-      category_id: categoryExists ? categoryExists.id : idNewCategory,
+      category: categoryExists,
     });
 
-    await transactionRespository.save(transaction);
+    await transactionRepository.save(transaction);
     return transaction;
   }
 }

@@ -35,6 +35,7 @@ export default class CreateTransactions1588129862014
           {
             name: 'category_id',
             type: 'uuid',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -56,7 +57,7 @@ export default class CreateTransactions1588129862014
         name: 'TransactionsCategory',
         columnNames: ['category_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'category',
+        referencedTableName: 'categories',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       }),
